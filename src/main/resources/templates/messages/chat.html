@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Сообщения по объявлению</title>
+</head>
+<body>
+
+<h1>Сообщения по объявлению</h1>
+
+<h2 th:text="${ad.title}">Заголовок объявления</h2>
+
+<hr>
+
+<div>
+    <h3>История сообщений:</h3>
+    <div th:if="${#lists.isEmpty(messages)}">
+        Сообщений пока нет.
+    </div>
+    <ul th:if="${!#lists.isEmpty(messages)}">
+        <li th:each="m : ${messages}">
+            <b th:text="${m.sender.username}">Отправитель</b> :
+            <span th:text="${m.text}">Текст</span>
+            <i th:text="${#temporals.format(m.createdAt, 'dd.MM.yyyy HH:mm')}"></i>
+        </li>
+    </ul>
+</div>
+
+<hr>
+
+<h3>Написать сообщение продавцу:</h3>
+<form th:action="@{'/ads/' + ${ad.id} + '/messages'}" method="post">
+    <textarea name="text" rows="4" cols="50" required></textarea><br>
+    <button type="submit">Отправить</button>
+</form>
+
+<p>
+    <a th:href="@{'/ads/' + ${ad.id}}">← Назад к объявлению</a>
+</p>
+
+</body>
+</html>

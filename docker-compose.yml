@@ -31,8 +31,8 @@ services:
             POSTGRES_USER: user
             POSTGRES_PASSWORD: password
         volumes:
-            - ovito_pgsql:/var/lib/postgresql/18/docker
+            - ovito_pg:/var/lib/postgresql/18/docker
 
 volumes:
-    ovito_pgsql:
+    ovito_pg:
     maven-repo:

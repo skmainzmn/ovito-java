@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">
+        Avito<span style="color:#ff5c5c;">Net</span>
+    </div>
+    <div>
+        <a th:href="@{/}" class="btn-primary">На главную</a>
+        <a th:href="@{/auth/login}" class="btn-primary" style="margin-left:8px;">Войти</a>
+    </div>
+</header>
+
+<main style="padding:20px; max-width:400px; margin:0 auto;">
+    <h2>Регистрация</h2>
+
+    <form th:action="@{/auth/register}"
+          th:object="${registrationDto}"
+          method="post"
+          style="display:flex;flex-direction:column;gap:10px;">
+
+        <label>
+            Логин:
+            <input type="text" th:field="*{username}" required>
+        </label>
+
+        <label>
+            E-mail:
+            <input type="email" th:field="*{email}" required>
+        </label>
+
+        <label>
+            Пароль:
+            <input type="password" th:field="*{password}" required>
+        </label>
+
+        <button type="submit" class="btn-primary">Зарегистрироваться</button>
+    </form>
+</main>
+
+</body>
+</html>

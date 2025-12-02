@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои объявления</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">
+            Авито&nbsp;Light
+        </a>
+    </div>
+
+    <div class="header-actions">
+        <a th:href="@{/ads/new}" class="btn-secondary">Новое объявление</a>
+        <a th:href="@{/logout}" class="btn-link">Выйти</a>
+    </div>
+</header>
+
+<main class="container">
+    <h1 class="section-title">Мои объявления</h1>
+
+    <div th:if="${#lists.isEmpty(ads)}">
+        <p class="empty-state">
+            У вас пока нет объявлений.
+            <a th:href="@{/ads/new}">Создать первое</a>.
+        </p>
+    </div>
+
+    <div class="ads-grid" th:if="${!#lists.isEmpty(ads)}">
+        <article class="ad-card" th:each="ad : ${ads}">
+            <div class="ad-card-top">
+                <a th:href="@{'/ads/' + ${ad.id}}" class="ad-title"
+                   th:text="${ad.title}">Заголовок объявления</a>
+
+                <span th:if="${ad.promoted}" class="promoted">
+                    Премиум
+                </span>
+            </div>
+
+            <div class="ad-price"
+                 th:text="${#numbers.formatDecimal(ad.price, 0, 'COMMA', 0, 'POINT')} + ' ₽'">
+                0 ₽
+            </div>
+
+            <div class="ad-city">
+                <span th:text="${ad.city}">Город</span>
+                <span th:if="${ad.category != null}">
+                    · <span th:text="${ad.category.name}">Категория</span>
+                </span>
+            </div>
+
+            <div class="ad-meta">
+                <span th:text="${#temporals.format(ad.createdAt, 'dd.MM.yyyy HH:mm')}">
+                    01.12.2025 12:00
+                </span>
+            </div>
+
+            <div class="ad-card-actions">
+                <a th:href="@{'/ads/' + ${ad.id}}" class="btn-text">Открыть</a>
+
+                <form th:action="@{'/payments/ad/' + ${ad.id} + '/promote'}"
+                      method="post">
+                    <button type="submit" class="btn-text highlight">
+                        Поднять
+                    </button>
+                </form>
+            </div>
+        </article>
+    </div>
+</main>
+
+</body>
+</html>

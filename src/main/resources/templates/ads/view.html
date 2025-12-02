@@ -1,31 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title th:text="${ad.title}">Объявление</title>
-    <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 
-<h1 th:text="${ad.title}"></h1>
+<div class="header">
+    <div class="logo">
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">Avito Clone</a>
+    </div>
 
-<p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
-<p th:text="'Город: ' + ${ad.city}"></p>
-<p th:if="${ad.category != null}"
-   th:text="'Категория: ' + ${ad.category.name}"></p>
+    <div class="search-bar">
+        <a th:href="@{/ads}" class="btn-primary">Все объявления</a>
+        <a th:href="@{/logout}" class="btn-primary" style="background:#e74c3c;">Выйти</a>
+    </div>
+</div>
 
-<h3>Описание</h3>
-<p th:text="${ad.description}"></p>
+<div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+    <h1 th:text="${ad.title}">Название объявления</h1>
 
-<br/>
+    <p class="ad-price" style="font-size: 22px;"
+       th:text="${ad.price} + ' ₽'">Цена</p>
 
-<a th:href="@{'/ads/' + ${ad.id} + '/edit'}">Редактировать</a>
+    <p class="ad-city"
+       th:text="'Город: ' + ${ad.city}">Город</p>
 
-<form th:action="@{'/ads/' + ${ad.id} + '/delete'}" method="post" style="margin-top: 20px;">
-    <button type="submit">Удалить объявление</button>
-</form>
+    <p th:text="${ad.category != null} ? ${ad.category.name} : 'Без категории'">
+        Категория
+    </p>
 
-<br/>
-<a href="/ads">← К списку объявлений</a>
+    <p th:text="${ad.description}">Описание</p>
+
+    <div th:if="${ad.promoted}">
+        <span style="color: orange; font-weight: bold;">
+            ⭐ Объявление поднято в поиске
+        </span>
+    </div>
+
+    <hr>
+
+    <!-- Кнопка "Поднять объявление" (фейковая оплата) -->
+    <form th:action="@{|/payments/ad/${ad.id}/promote|}" method="post" style="margin-top: 15px;">
+        <button type="submit" class="btn-primary">
+            Поднять объявление (199 ₽)
+        </button>
+    </form>
+
+</div>
 
 </body>
 </html>

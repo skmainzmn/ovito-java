@@ -1,50 +1,44 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Список объявлений</title>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <title>Все объявления</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 
-<h1>Объявления</h1>
+<div class="header">
+    <div class="logo">
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">Avito Clone</a>
+    </div>
 
-<a href="/ads/new">+ Создать объявление</a>
-<br/><br/>
-
-<form method="get" th:action="@{/ads}">
-    <input type="text" name="q" th:value="${q}" placeholder="Поиск по названию..." />
-
-    <select name="categoryId">
-        <option value="">Все категории</option>
-        <option th:each="cat : ${categories}"
-                th:value="${cat.id}"
-                th:selected="${cat.id == selectedCategoryId}"
-                th:text="${cat.name}">
-        </option>
-    </select>
-
-    <input type="text" name="city" th:value="${city}" placeholder="Город" />
-    <input type="number" name="minPrice" th:value="${minPrice}" placeholder="Мин. цена" />
-    <input type="number" name="maxPrice" th:value="${maxPrice}" placeholder="Макс. цена" />
-
-    <button type="submit">Фильтровать</button>
-</form>
-
-<hr/>
-
-<div th:if="${#lists.isEmpty(ads)}">
-    <p>Ничего не найдено.</p>
+    <div class="search-bar">
+        <a th:href="@{/ads/new}" class="btn-primary">Подать объявление</a>
+        <a th:href="@{/logout}" class="btn-primary" style="background: #e74c3c;">Выйти</a>
+    </div>
 </div>
 
-<div th:each="ad : ${ads}">
-    <h2 th:text="${ad.title}"></h2>
-    <p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
-    <p th:text="'Город: ' + ${ad.city}"></p>
-    <a th:href="@{'/ads/' + ${ad.id}}">Подробнее</a>
-    <hr/>
-</div>
+<h2 style="padding: 20px;">Все объявления</h2>
 
-<a href="/">← На главную</a>
+<div class="ads-grid">
+    <div th:each="ad : ${ads}"
+         th:class="'ad-card ' + (${ad.promoted} ? 'promoted' : '')">
+
+        <a th:href="@{|/ads/${ad.id}|}" style="text-decoration: none; color: inherit;">
+            <div class="ad-title" th:text="${ad.title}">Название</div>
+        </a>
+
+        <div class="ad-price"
+             th:text="${ad.price} + ' ₽'">
+            10 000 ₽
+        </div>
+
+        <div class="ad-city"
+             th:text="${ad.city}">
+            Город
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

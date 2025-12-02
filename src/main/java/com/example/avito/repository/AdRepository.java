@@ -1,19 +1,46 @@
 package com.example.avito.repository;
 
 import com.example.avito.entity.Ad;
-import com.example.avito.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface AdRepository extends JpaRepository<Ad, Long> {
 
-    List<Ad> findByTitleContainingIgnoreCase(String title);
+    // все объявления, самые новые сначала
+    List<Ad> findAllByOrderByCreatedAtDesc();
 
-    List<Ad> findByCategory(Category category);
+    // только по тексту
+    List<Ad> findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String q);
 
-    List<Ad> findByCityIgnoreCase(String city);
+    // только по категории
+    List<Ad> findByCategoryIdOrderByCreatedAtDesc(Long categoryId);
 
-    List<Ad> findByPriceBetween(BigDecimal min, BigDecimal max);
+    // только по городу
+    List<Ad> findByCityIgnoreCaseOrderByCreatedAtDesc(String city);
+
+    // текст + категория
+    List<Ad> findByTitleContainingIgnoreCaseAndCategoryIdOrderByCreatedAtDesc(
+            String q,
+            Long categoryId
+    );
+
+    // текст + город
+    List<Ad> findByTitleContainingIgnoreCaseAndCityIgnoreCaseOrderByCreatedAtDesc(
+            String q,
+            String city
+    );
+
+    // категория + город
+    List<Ad> findByCategoryIdAndCityIgnoreCaseOrderByCreatedAtDesc(
+            Long categoryId,
+            String city
+    );
+
+    // текст + категория + город
+    List<Ad> findByTitleContainingIgnoreCaseAndCategoryIdAndCityIgnoreCaseOrderByCreatedAtDesc(
+            String q,
+            Long categoryId,
+            String city
+    );
 }

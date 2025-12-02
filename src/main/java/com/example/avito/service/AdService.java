@@ -2,10 +2,10 @@ package com.example.avito.service;
 
 import com.example.avito.entity.Ad;
 import com.example.avito.entity.Category;
+import com.example.avito.entity.User;
 import com.example.avito.repository.AdRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,70 +14,75 @@ public class AdService {
 
     private final AdRepository adRepository;
     private final CategoryService categoryService;
+    private final UserService userService;
 
-    public AdService(AdRepository adRepository, CategoryService categoryService) {
+    public AdService(AdRepository adRepository,
+                     CategoryService categoryService,
+                     UserService userService) {
         this.adRepository = adRepository;
         this.categoryService = categoryService;
+        this.userService = userService;
     }
 
+    // 🔹 СПИСОК объявлений (для главной / списка)
     public List<Ad> getAllAds() {
-        return adRepository.findAll();
+        return adRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    // 🔹 Поиск по фильтрам (если ты уже делала)
+    public List<Ad> searchAds(String q, Long categoryId, String city) {
+        boolean hasText = q != null && !q.isBlank();
+        boolean hasCat = categoryId != null;
+        boolean hasCity = city != null && !city.isBlank();
+
+        if (hasText && hasCat && hasCity) {
+            return adRepository
+                    .findByTitleContainingIgnoreCaseAndCategoryIdAndCityIgnoreCaseOrderByCreatedAtDesc(
+                            q, categoryId, city);
+        } else if (hasText && hasCat) {
+            return adRepository
+                    .findByTitleContainingIgnoreCaseAndCategoryIdOrderByCreatedAtDesc(q, categoryId);
+        } else if (hasText && hasCity) {
+            return adRepository
+                    .findByTitleContainingIgnoreCaseAndCityIgnoreCaseOrderByCreatedAtDesc(q, city);
+        } else if (hasCat && hasCity) {
+            return adRepository
+                    .findByCategoryIdAndCityIgnoreCaseOrderByCreatedAtDesc(categoryId, city);
+        } else if (hasText) {
+            return adRepository.findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(q);
+        } else if (hasCat) {
+            return adRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId);
+        } else if (hasCity) {
+            return adRepository.findByCityIgnoreCaseOrderByCreatedAtDesc(city);
+        } else {
+            return getAllAds();
+        }
+    }
+
+    // 🔹 Получить по id
     public Ad getById(Long id) {
         return adRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
+                .orElseThrow(() -> new IllegalArgumentException("Объявление не найдено: " + id));
     }
 
-    public List<Ad> search(String q, Long categoryId, String city,
-                           BigDecimal minPrice, BigDecimal maxPrice) {
-
-        if (q != null && !q.isBlank()) {
-            return adRepository.findByTitleContainingIgnoreCase(q);
-        }
-
-        if (categoryId != null) {
-            Category category = categoryService.getById(categoryId);
-            return adRepository.findByCategory(category);
-        }
-
-        if (city != null && !city.isBlank()) {
-            return adRepository.findByCityIgnoreCase(city);
-        }
-
-        if (minPrice != null && maxPrice != null) {
-            return adRepository.findByPriceBetween(minPrice, maxPrice);
-        }
-
-        return adRepository.findAll();
-    }
-
-    public Ad create(Ad ad, Long categoryId) {
+    // 🔥 ВАЖНО: именно ЭТОТ метод вызывается из AdController
+    public Ad createAd(Ad ad, Long categoryId) {
         ad.setCreatedAt(LocalDateTime.now());
-        if (categoryId != null) {
-            Category category = categoryService.getById(categoryId);
-            ad.setCategory(category);
-        }
-        return adRepository.save(ad);
-    }
-
-    public Ad update(Long id, Ad updated, Long categoryId) {
-        Ad ad = getById(id);
-
-        ad.setTitle(updated.getTitle());
-        ad.setDescription(updated.getDescription());
-        ad.setPrice(updated.getPrice());
-        ad.setCity(updated.getCity());
 
         if (categoryId != null) {
             Category category = categoryService.getById(categoryId);
             ad.setCategory(category);
         }
 
+        // текущий залогиненный пользователь
+        User owner = userService.getCurrentUser();
+        ad.setOwner(owner);
+
         return adRepository.save(ad);
     }
 
-    public void delete(Long id) {
-        adRepository.deleteById(id);
+    // нужен для PaymentService / promote
+    public Ad save(Ad ad) {
+        return adRepository.save(ad);
     }
 }

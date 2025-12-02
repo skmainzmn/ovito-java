@@ -7,9 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Controller
 @RequestMapping("/ads")
 public class AdController {
@@ -17,74 +14,41 @@ public class AdController {
     private final AdService adService;
     private final CategoryService categoryService;
 
-    public AdController(AdService adService, CategoryService categoryService) {
+    public AdController(AdService adService,
+                        CategoryService categoryService) {
         this.adService = adService;
         this.categoryService = categoryService;
     }
 
+    // список всех объявлений
     @GetMapping
-    public String listAds(@RequestParam(required = false) String q,
-                          @RequestParam(required = false) Long categoryId,
-                          @RequestParam(required = false) String city,
-                          @RequestParam(required = false) BigDecimal minPrice,
-                          @RequestParam(required = false) BigDecimal maxPrice,
-                          Model model) {
-
-        List<Ad> ads = adService.search(q, categoryId, city, minPrice, maxPrice);
-
-        model.addAttribute("ads", ads);
+    public String listAds(Model model) {
+        model.addAttribute("ads", adService.getAllAds());
         model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("selectedCategoryId", categoryId);
-        model.addAttribute("q", q);
-        model.addAttribute("city", city);
-        model.addAttribute("minPrice", minPrice);
-        model.addAttribute("maxPrice", maxPrice);
-
-        return "ads/list";
+        return "ads/list"; // ads/list.html
     }
 
+    // просмотр одного объявления
     @GetMapping("/{id}")
     public String viewAd(@PathVariable Long id, Model model) {
         Ad ad = adService.getById(id);
         model.addAttribute("ad", ad);
-        return "ads/view";
+        return "ads/view"; // ads/view.html
     }
 
+    // форма создания объявления
     @GetMapping("/new")
     public String newAdForm(Model model) {
         model.addAttribute("ad", new Ad());
         model.addAttribute("categories", categoryService.findAll());
-        return "ads/new";
+        return "ads/new"; // ads/new.html
     }
 
+    // 🔥 обработка отправки формы
     @PostMapping
-    public String createAd(@ModelAttribute("ad") Ad ad,
+    public String createAd(@ModelAttribute Ad ad,
                            @RequestParam(required = false) Long categoryId) {
-
-        Ad saved = adService.create(ad, categoryId);
-        return "redirect:/ads/" + saved.getId();
-    }
-
-    @GetMapping("/{id}/edit")
-    public String editAdForm(@PathVariable Long id, Model model) {
-        Ad ad = adService.getById(id);
-        model.addAttribute("ad", ad);
-        model.addAttribute("categories", categoryService.findAll());
-        return "ads/edit";
-    }
-
-    @PostMapping("/{id}/edit")
-    public String updateAd(@PathVariable Long id,
-                           @ModelAttribute("ad") Ad ad,
-                           @RequestParam(required = false) Long categoryId) {
-
-        adService.update(id, ad, categoryId);
-        return "redirect:/ads/" + id;
-    }
-
-    @PostMapping("/{id}/delete")
-    public String deleteAd(@PathVariable Long id) {
-        adService.delete(id);
+        adService.createAd(ad, categoryId);
         return "redirect:/ads";
     }
 }

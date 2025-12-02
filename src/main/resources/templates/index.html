@@ -1,31 +1,93 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mini Avito</title>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <title>Avito Mini</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 
-<h1>Все объявления</h1>
+<header class="header">
+    <div class="logo">
+        Avito<span style="color:#ff6f3c;">Mini</span>
+    </div>
 
-<a href="/ads/new">+ Создать объявление</a>
-<br/><br/>
+    <!-- Поисковая форма -->
+    <form class="search-bar" th:action="@{/}" method="get">
+        <input type="text"
+               name="q"
+               placeholder="Поиск по объявлениям"
+               th:value="${q}">
 
-<a href="/ads">Перейти к расширенному списку и фильтрам</a>
+        <select name="categoryId">
+            <option value="">Все категории</option>
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.name}"
+                    th:selected="${categoryId != null and categoryId == cat.id}">
+            </option>
+        </select>
 
-<hr/>
+        <input type="text"
+               name="city"
+               placeholder="Город"
+               th:value="${city}">
 
-<div th:if="${#lists.isEmpty(ads)}">
-    <p>Пока нет ни одного объявления.</p>
-</div>
+        <button type="submit" class="btn-primary">Найти</button>
+    </form>
 
-<div th:each="ad : ${ads}">
-    <h2 th:text="${ad.title}"></h2>
-    <p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
-    <p th:text="'Город: ' + ${ad.city}"></p>
-    <a th:href="@{'/ads/' + ${ad.id}}">Подробнее</a>
-    <hr/>
-</div>
+    <!-- Кнопки справа -->
+    <div>
+        <a th:href="@{/ads/new}" class="btn-primary">+ Подать объявление</a>
+
+        <!-- Показывать "Войти", если пользователь не залогинен -->
+        <a th:if="${#authentication == null or !#authentication.authenticated}"
+           th:href="@{/auth/login}"
+           class="btn-primary">
+            Войти
+        </a>
+
+        <!-- Показывать "Выйти", если пользователь залогинен -->
+        <a th:if="${#authentication != null and #authentication.authenticated}"
+           th:href="@{/auth/logout}"
+           class="btn-primary">
+            Выйти
+        </a>
+    </div>
+</header>
+
+<main>
+    <section class="ads-grid">
+        <div class="ad-card"
+             th:each="ad : ${ads}"
+             th:classappend="${ad.promoted} ? ' promoted'">
+            <a th:href="@{'/ads/' + ${ad.id}}">
+                <h2 class="ad-title"
+                    th:text="${ad.title}">Заголовок</h2>
+            </a>
+
+            <div class="ad-price"
+                 th:text="${#numbers.formatDecimal(ad.price, 0, 'COMMA', 2, 'POINT')} + ' ₽'">
+                10 000 ₽
+            </div>
+
+            <div class="ad-city"
+                 th:text="${ad.city}">
+                Москва
+            </div>
+
+            <div class="ad-city"
+                 th:text="${ad.category != null ? ad.category.name : 'Без категории'}">
+                Категория
+            </div>
+
+            <div class="ad-city"
+                 th:text="${#temporals.format(ad.createdAt, 'dd.MM.yyyy HH:mm')}">
+                01.12.2025 12:00
+            </div>
+        </div>
+    </section>
+</main>
 
 </body>
 </html>
