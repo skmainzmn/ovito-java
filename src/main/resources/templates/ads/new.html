@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Новое объявление</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h1>Создать объявление</h1>
+
+<form th:action="@{/ads}" th:object="${ad}" method="post">
+
+    <div>
+        <label>Название:</label><br/>
+        <input type="text" th:field="*{title}" />
+    </div>
+
+    <div>
+        <label>Описание:</label><br/>
+        <textarea th:field="*{description}"></textarea>
+    </div>
+
+    <div>
+        <label>Цена:</label><br/>
+        <input type="number" step="0.01" th:field="*{price}" />
+    </div>
+
+    <div>
+        <label>Город:</label><br/>
+        <input type="text" th:field="*{city}" />
+    </div>
+
+    <div>
+        <label>Категория:</label><br/>
+        <select name="categoryId">
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.name}">
+            </option>
+        </select>
+    </div>
+
+    <br/>
+    <button type="submit">Создать</button>
+</form>
+
+<br/>
+<a href="/ads">← Назад к списку</a>
+
+</body>
+</html>

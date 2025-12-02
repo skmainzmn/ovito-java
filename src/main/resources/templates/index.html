@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mini Avito</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h1>Все объявления</h1>
+
+<a href="/ads/new">+ Создать объявление</a>
+<br/><br/>
+
+<a href="/ads">Перейти к расширенному списку и фильтрам</a>
+
+<hr/>
+
+<div th:if="${#lists.isEmpty(ads)}">
+    <p>Пока нет ни одного объявления.</p>
+</div>
+
+<div th:each="ad : ${ads}">
+    <h2 th:text="${ad.title}"></h2>
+    <p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
+    <p th:text="'Город: ' + ${ad.city}"></p>
+    <a th:href="@{'/ads/' + ${ad.id}}">Подробнее</a>
+    <hr/>
+</div>
+
+</body>
+</html>

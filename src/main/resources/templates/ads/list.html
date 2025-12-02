@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Список объявлений</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h1>Объявления</h1>
+
+<a href="/ads/new">+ Создать объявление</a>
+<br/><br/>
+
+<form method="get" th:action="@{/ads}">
+    <input type="text" name="q" th:value="${q}" placeholder="Поиск по названию..." />
+
+    <select name="categoryId">
+        <option value="">Все категории</option>
+        <option th:each="cat : ${categories}"
+                th:value="${cat.id}"
+                th:selected="${cat.id == selectedCategoryId}"
+                th:text="${cat.name}">
+        </option>
+    </select>
+
+    <input type="text" name="city" th:value="${city}" placeholder="Город" />
+    <input type="number" name="minPrice" th:value="${minPrice}" placeholder="Мин. цена" />
+    <input type="number" name="maxPrice" th:value="${maxPrice}" placeholder="Макс. цена" />
+
+    <button type="submit">Фильтровать</button>
+</form>
+
+<hr/>
+
+<div th:if="${#lists.isEmpty(ads)}">
+    <p>Ничего не найдено.</p>
+</div>
+
+<div th:each="ad : ${ads}">
+    <h2 th:text="${ad.title}"></h2>
+    <p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
+    <p th:text="'Город: ' + ${ad.city}"></p>
+    <a th:href="@{'/ads/' + ${ad.id}}">Подробнее</a>
+    <hr/>
+</div>
+
+<a href="/">← На главную</a>
+
+</body>
+</html>

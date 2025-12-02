@@ -1,7 +1,38 @@
 services:
-  postgres:
-    image: postgres:latest
-    ports:
-      - 5435:5432
-    environment:
-      POSTGRES_PASSWORD: password
+    maven:
+        image: maven:4.0.0-rc-5-eclipse-temurin-21-alpine
+        volumes:
+            - .:/usr/src/mymaven
+            - maven-repo:/root/.m2
+        working_dir: /usr/src/mymaven
+        command: mvn clean install -DskipTests
+    app:
+        image: openjdk:21-ea-1-jdk-slim
+        working_dir: /app
+        ports:
+            - "8082:8082"
+        expose:
+            - "8082/tcp"
+        volumes:
+            - ./:/app
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ovito
+            SPRING_DATASOURCE_USERNAME: user
+            SPRING_DATASOURCE_PASSWORD: password
+        command: ["java", "-jar", "target/avito-netbeans-0.0.1-SNAPSHOT.jar"]
+        depends_on:
+            - postgres
+    postgres:
+        image: postgres:18-alpine
+        ports:
+            - ${DB_EXTERNAL_PORT:-5439}:5432
+        environment:
+            POSTGRES_DB: ovito
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        volumes:
+            - ovito_pgsql:/var/lib/postgresql/18/docker
+
+volumes:
+    ovito_pgsql:
+    maven-repo:

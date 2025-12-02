@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${ad.title}">Объявление</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h1 th:text="${ad.title}"></h1>
+
+<p th:text="'Цена: ' + ${ad.price} + ' ₽'"></p>
+<p th:text="'Город: ' + ${ad.city}"></p>
+<p th:if="${ad.category != null}"
+   th:text="'Категория: ' + ${ad.category.name}"></p>
+
+<h3>Описание</h3>
+<p th:text="${ad.description}"></p>
+
+<br/>
+
+<a th:href="@{'/ads/' + ${ad.id} + '/edit'}">Редактировать</a>
+
+<form th:action="@{'/ads/' + ${ad.id} + '/delete'}" method="post" style="margin-top: 20px;">
+    <button type="submit">Удалить объявление</button>
+</form>
+
+<br/>
+<a href="/ads">← К списку объявлений</a>
+
+</body>
+</html>
